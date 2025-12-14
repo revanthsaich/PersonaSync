@@ -31,3 +31,56 @@ archive.zip
 
 # Ignore while the setup still depends on requirements.txt files
 uv.lock
+
+
+# -------------------------
+# Node.js
+# -------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# -------------------------
+# Environment variables
+# -------------------------
+.env
+.env.local
+.env.development
+.env.production
+
+# -------------------------
+# Logs
+# -------------------------
+logs/
+*.log
+
+# -------------------------
+# OS files
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Editor / IDE
+# -------------------------
+.vscode/
+.idea/
+*.swp
+
+# -------------------------
+# Build / cache
+# -------------------------
+dist/
+build/
+.cache/
+
+# -------------------------
+# Coverage
+# -------------------------
+coverage/
+
+# -------------------------
+# Docker (optional)
+# -------------------------
+.env.docker

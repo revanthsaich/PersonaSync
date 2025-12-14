@@ -49,3 +49,20 @@ def process_image(req: ImageRequest):
     user_spaces[req.user_id] = updated_stats
 
     return {"results": results}
+
+
+
+@app.get("/debug/users")
+def debug_users():
+    summary = {}
+
+    for user_id, person_stats in user_spaces.items():
+        summary[user_id] = {
+            "total_persons": len(person_stats),
+            "persons": {
+                pid: data["count"]
+                for pid, data in person_stats.items()
+            }
+        }
+
+    return summary
