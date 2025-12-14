@@ -1,0 +1,51 @@
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import List
+
+from app.utils import load_image_from_url
+from app.state import user_spaces
+from app.ml_core import process_image_in_memory_space
+
+app = FastAPI(title="PersonaSync ML Service")
+
+# ---------- Request / Response ----------
+
+class ImageRequest(BaseModel):
+    user_id: str
+    image_url: str
+
+class FaceResult(BaseModel):
+    face_index: int
+    person_id: str
+    confidence: float
+
+class ProcessResponse(BaseModel):
+    results: List[FaceResult]
+
+# ---------- API ----------
+
+@app.post("/process-image", response_model=ProcessResponse)
+def process_image(req: ImageRequest):
+
+    # 1️⃣ Get user memory
+    if req.user_id not in user_spaces:
+        user_spaces[req.user_id] = {}
+
+    person_stats = user_spaces[req.user_id]
+
+    # 2️⃣ Load image
+    try:
+        image = load_image_from_url(req.image_url)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid image URL")
+
+    # 3️⃣ Run ML (UNCHANGED LOGIC)
+    results, updated_stats = process_image_in_memory_space(
+        image,
+        person_stats
+    )
+
+    # 4️⃣ Save memory
+    user_spaces[req.user_id] = updated_stats
+
+    return {"results": results}
