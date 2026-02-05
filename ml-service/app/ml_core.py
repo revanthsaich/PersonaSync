@@ -53,10 +53,31 @@ def extract_faces_and_embeddings(image):
         emb = face.embedding
         emb = emb / np.linalg.norm(emb)
 
+        # Extract face crop from image
+        bbox = face.bbox
+        x1, y1, x2, y2 = map(int, bbox)
+        h, w = image.shape[:2]
+        x1, y1 = max(0, x1), max(0, y1)
+        x2, y2 = min(w, x2), min(h, y2)
+        
+        face_crop = image[y1:y2, x1:x2]
+        
+        # Convert face crop to base64
+        face_base64 = None
+        if face_crop.size > 0:
+            # Resize to 256x256
+            face_resized = cv2.resize(face_crop, (256, 256))
+            # Convert RGB to BGR for cv2.imencode
+            face_bgr = cv2.cvtColor(face_resized, cv2.COLOR_RGB2BGR)
+            _, buffer = cv2.imencode('.jpg', face_bgr, [cv2.IMWRITE_JPEG_QUALITY, 90])
+            import base64
+            face_base64 = base64.b64encode(buffer).decode('utf-8')
+
         results.append({
             "face_index": i,
             "embedding": emb,
-            "bbox": face.bbox
+            "bbox": face.bbox,
+            "face_image": face_base64
         })
 
     return results
@@ -109,7 +130,8 @@ def process_image_in_memory_space(image, person_stats):
             "face_index": face["face_index"],
             "person_id": person_id,
             "confidence": round(best_score, 3),
-            "bbox": face["bbox"].tolist()
+            "bbox": face["bbox"].tolist(),
+            "face_image": face.get("face_image")
         })
 
     return results, person_stats

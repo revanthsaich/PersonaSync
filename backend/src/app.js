@@ -7,6 +7,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from 'uploads' directory
+app.use("/uploads", express.static("uploads"));
+
 // Health check
 app.get("/health", (req, res) => {
   res.json({ status: "OK", service: "PersonaSync Backend" });

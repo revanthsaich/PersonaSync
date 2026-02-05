@@ -8,6 +8,10 @@ from app.ml_core import process_image_in_memory_space
 
 app = FastAPI(title="PersonaSync ML Service")
 
+@app.get("/")
+def read_root():
+    return {"message": "PersonaSync ML Service is running. Visit /docs for API documentation."}
+
 # ---------- Request / Response ----------
 
 class ImageRequest(BaseModel):
@@ -18,6 +22,8 @@ class FaceResult(BaseModel):
     face_index: int
     person_id: str
     confidence: float
+    bbox: list
+    face_image: str | None = None
 
 class ProcessResponse(BaseModel):
     results: List[FaceResult]
